@@ -11,7 +11,11 @@
     "prisma:migrate": "npx prisma migrate dev",
     "prisma:db:create": "npx prisma db push",
     "prisma:studio": "npx prisma studio",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "test": "npx playwright test",
+    "test:report": "npx playwright show-report",
+    "test:headed": "npx playwright test --headed",
+    "codegen": "npx playwright codegen"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -66,6 +70,7 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.52.0",
     "@types/node": "^22.14.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",

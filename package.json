@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "tsx prisma/seed.ts && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -11,7 +11,7 @@
     "prisma:migrate": "npx prisma migrate dev",
     "prisma:db:create": "npx prisma db push",
     "prisma:studio": "npx prisma studio",
-    "seed": "tsx prisma/seed.ts",
+    "seed": "ts-node prisma/seed.ts",
     "test": "npx playwright test",
     "test:report": "npx playwright show-report",
     "test:headed": "npx playwright test --headed",
@@ -80,5 +80,8 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }

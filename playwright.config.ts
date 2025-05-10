@@ -1,6 +1,6 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices, PlaywrightTestConfig } from '@playwright/test';
 
-export default defineConfig({
+const config: PlaywrightTestConfig = defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -8,9 +8,13 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
 
+  // Setup y teardown global
+  globalSetup: './tests/utils/global-setup.ts',
+  globalTeardown: './tests/utils/global-teardown.ts',
+
   use: {
     trace: 'on-first-retry',
-    baseURL: 'http://localhost:3000', // útil para usar `page.goto('/')`
+    baseURL: 'http://localhost:3000',
   },
 
   projects: [
@@ -22,17 +26,19 @@ export default defineConfig({
       name: 'firefox',
       use: { ...devices['Desktop Firefox'], headless: true },
     },
-    // WebKit deshabilitado para ahorrar recursos
+    // WebKit deshabilitado (opcional)
     // {
     //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'], headless: false },
+    //   use: { ...devices['Desktop Safari'] },
     // },
   ],
 
   webServer: {
     command: 'npm run dev',
     port: 3000,
-    timeout: 120 * 1000, // Tiempo máximo de espera
+    timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
   },
 });
+
+export default config;

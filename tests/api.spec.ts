@@ -2,28 +2,23 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Logout funcionalidad', () => {
   test('debería eliminar la cookie de sesión y redirigir al login', async ({ page }) => {
-    // 1. Navegar a la página principal (o una donde se supone que el usuario esté logueado)
+    // 1. Navegar a una página autenticada
     await page.goto('http://localhost:3000')
 
-    // Asegúrate de que la cookie 'session' existe antes de hacer el POST
-    const cookiesBeforeLogout = await page.context().cookies()
-    const sessionCookieBefore = cookiesBeforeLogout.find(cookie => cookie.name === 'session')
-    expect(sessionCookieBefore).toBeDefined()
+    // Verificar que existe la cookie de sesión
+    const cookiesBefore = await page.context().cookies()
+    const sessionCookie = cookiesBefore.find(c => c.name === 'session')
+    expect(sessionCookie).toBeDefined()
 
-    // 2. Realizar una solicitud POST a la ruta de logout
-    const response = await page.request.post('/api/logout')
+    // 2. Hacer clic en el botón de logout (ajusta el selector si es necesario)
+    await page.getByRole('button', { name: 'Cerrar sesión' }).click()
 
-    // 3. Verificar que la cookie 'session' ha sido eliminada
-    const cookiesAfterLogout = await page.context().cookies()
-    const sessionCookieAfter = cookiesAfterLogout.find(cookie => cookie.name === 'session')
-    expect(sessionCookieAfter).toBeUndefined()
+    // 3. Verificar que estamos en la página de login
+    await expect(page).toHaveURL(/\/login/)
 
-    // 4. Verificar que la redirección sea a la página de login
-    expect(response.status()).toBe(302) // Redirección
-    expect(response.headers()['location']).toBe('/login')
-
-    // 5. Verificar que el usuario esté efectivamente en la página de login después de la redirección
-    await page.goto('/login')
-    await expect(page).toHaveURL('/login')
+    // 4. Confirmar que la cookie fue eliminada
+    const cookiesAfter = await page.context().cookies()
+    const sessionAfter = cookiesAfter.find(c => c.name === 'session')
+    expect(sessionAfter).toBeUndefined()
   })
 })

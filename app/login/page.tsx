@@ -20,6 +20,7 @@ const loginSchema = z.object({
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("") // 👈 estado para el error
   const router = useRouter()
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -32,6 +33,8 @@ export default function LoginPage() {
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     setIsLoading(true)
+    setErrorMessage("") // resetear error anterior
+
     try {
       await loginUser({
         email: values.email,
@@ -50,6 +53,8 @@ export default function LoginPage() {
         description: "Email o contraseña incorrectos",
         variant: "destructive",
       })
+
+      setErrorMessage("Email o contraseña incorrectos") // 👈 mostrar en la UI
     } finally {
       setIsLoading(false)
     }
@@ -107,6 +112,16 @@ export default function LoginPage() {
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
                 </Button>
+
+                {/* 👇 mensaje de error visible */}
+                {errorMessage && (
+                  <p
+                    data-testid="login-error"
+                    className="text-red-500 text-sm text-center mt-2"
+                  >
+                    {errorMessage}
+                  </p>
+                )}
               </form>
             </Form>
 
@@ -122,4 +137,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

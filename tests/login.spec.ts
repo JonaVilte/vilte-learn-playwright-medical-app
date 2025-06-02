@@ -1,98 +1,69 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Página de Login', () => {
-  
-  // Test para verificar que los elementos del formulario se rendericen correctamente
-  test('debería renderizar el formulario de inicio de sesión', async ({ page }) => {
-    // Navegar a la página de login
-    await page.goto('http://localhost:3000/login');
 
-    // Verificar que los campos de email y contraseña están presentes
-    await expect(page.locator('input[type="email"]')).toBeVisible();
-    await expect(page.locator('input[type="password"]')).toBeVisible();
+test('debería renderizar el formulario de inicio de sesión', async ({ page }) => {
+  await page.goto('http://localhost:3000/login');
 
-    // Verificar que el botón de "Iniciar sesión" está visible y tiene el texto correcto
-    const loginButton = page.locator('button:has-text("Iniciar sesión")');
-    await expect(loginButton).toBeVisible();
-  });
+  await expect(page.locator('input[type="email"]')).toBeVisible();
+  await expect(page.locator('input[type="password"]')).toBeVisible();
 
-  // Test para el inicio de sesión exitoso con credenciales válidas
-  test('debería iniciar sesión con credenciales válidas y redirigir al dashboard', async ({ page }) => {
-    // Navegar a la página de login
-    await page.goto('http://localhost:3000/login');
+  const loginButton = page.getByRole('button', { name: 'Iniciar sesión' });
+  await expect(loginButton).toBeVisible();
+});
 
-    // Ingresar un email y contraseña válidos
-    await page.fill('input[type="email"]', 'usuario@ejemplo.com');
-    await page.fill('input[type="password"]', 'contraseñaCorrecta');
+test('debería iniciar sesión con credenciales válidas y redirigir al dashboard', async ({ page }) => {
+  await page.goto('http://localhost:3000/login');
 
-    // Hacer clic en el botón de inicio de sesión
-    const loginButton = page.locator('button:has-text("Iniciar sesión")');
-    await loginButton.click();
+  await page.fill('input[type="email"]', 'testuser@example.com');
+  await page.fill('input[type="password"]', 'test1234');
 
-    // Verificar que el usuario fue redirigido al dashboard
-    await expect(page).toHaveURL('/dashboard');
-  });
+  const regisButton = page.getByRole('button', { name: 'Iniciar sesión' });
+  await expect(regisButton).toBeVisible();
+  await regisButton.click();
+  await expect(page).toHaveURL('http://localhost:3000/dashboard');
+});
 
-  // Test para el inicio de sesión con credenciales inválidas
-  test('debería mostrar error con credenciales incorrectas', async ({ page }) => {
-    // Navegar a la página de login
-    await page.goto('http://localhost:3000/login');
+test('debería mostrar error con credenciales incorrectas', async ({ page }) => {
+  await page.goto('http://localhost:3000/login');
 
-    // Ingresar un email y contraseña incorrectos
-    await page.fill('input[type="email"]', 'usuario@ejemplo.com');
-    await page.fill('input[type="password"]', 'contraseñaIncorrecta');
+  await page.fill('input[type="email"]', 'test@example.com');
+  await page.fill('input[type="password"]', 'test8765');
 
-    // Hacer clic en el botón de inicio de sesión
-    const loginButton = page.locator('button:has-text("Iniciar sesión")');
-    await loginButton.click();
+  const loginButton = page.getByRole('button', { name: 'Iniciar sesión' });
+  await expect(loginButton).toBeVisible();
+  await loginButton.click();
+  await expect(page.getByText('Email o contraseña incorrectos')).toBeVisible();
+});
 
-    // Verificar que el mensaje de error es visible
-    await expect(page.locator('text=Error al iniciar sesión')).toBeVisible();
-    await expect(page.locator('text=Email o contraseña incorrectos')).toBeVisible();
-  });
+test('debería mostrar error si el email está vacío', async ({ page }) => {
+  await page.goto('http://localhost:3000/login');
 
-  // Test para verificar la validación de campo de email vacío
-  test('debería mostrar error si el email está vacío', async ({ page }) => {
-    // Navegar a la página de login
-    await page.goto('http://localhost:3000/login');
+  await page.fill('input[type="password"]', 'contraseñaCorrecta');
 
-    // Dejar el campo de email vacío y completar solo la contraseña
-    await page.fill('input[type="password"]', 'contraseñaCorrecta');
+  const loginButton = page.getByRole('button', { name: 'Iniciar sesión' });
+  await expect(loginButton).toBeVisible();
+  await loginButton.click();
+  await expect(page.getByText('Ingrese un email válido')).toBeVisible();
 
-    // Hacer clic en el botón de inicio de sesión
-    const loginButton = page.locator('button:has-text("Iniciar sesión")');
-    await loginButton.click();
 
-    // Verificar que se muestra un mensaje de error sobre el email
-    await expect(page.locator('text=Ingrese un email válido')).toBeVisible();
-  });
+});
 
-  // Test para verificar la validación de campo de contraseña vacío
-  test('debería mostrar error si la contraseña está vacía', async ({ page }) => {
-    // Navegar a la página de login
-    await page.goto('http://localhost:3000/login');
+test('debería mostrar error si la contraseña está vacía', async ({ page }) => {
+  await page.goto('http://localhost:3000/login');
 
-    // Dejar el campo de contraseña vacío y completar solo el email
-    await page.fill('input[type="email"]', 'usuario@ejemplo.com');
+  await page.fill('input[type="email"]', 'testuser@example.com');
 
-    // Hacer clic en el botón de inicio de sesión
-    const loginButton = page.locator('button:has-text("Iniciar sesión")');
-    await loginButton.click();
+  const loginButton = page.getByRole('button', { name: 'Iniciar sesión' });
+  await expect(loginButton).toBeVisible();
+  await loginButton.click();
+  await expect(page.getByText('La contraseña es requerida')).toBeVisible();
+});
 
-    // Verificar que se muestra un mensaje de error sobre la contraseña
-    await expect(page.locator('text=La contraseña es requerida')).toBeVisible();
-  });
+test('debería redirigir a la página de registro', async ({ page }) => {
+  await page.goto('http://localhost:3000/login');
 
-  // Test para verificar el enlace de registro
-  test('debería redirigir a la página de registro', async ({ page }) => {
-    // Navegar a la página de login
-    await page.goto('http://localhost:3000/login');
-
-    // Hacer clic en el enlace "Registrarse"
-    const registerLink = page.locator('text=Registrarse');
-    await registerLink.click();
-
-    // Verificar que la página se redirige a la página de registro
-    await expect(page).toHaveURL('/register');
-  });
+  const registerLink = page.getByRole('link', { name: 'Registrarse' });
+  await expect(registerLink).toBeVisible();
+  await registerLink.click();
+  await expect(page).toHaveURL('http://localhost:3000/register');
 });

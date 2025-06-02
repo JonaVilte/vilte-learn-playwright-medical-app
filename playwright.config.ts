@@ -21,11 +21,11 @@ const config: PlaywrightTestConfig = defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'], headless: true },
-    },
+    }
+    //{
+      //name: 'firefox',
+      //use: { ...devices['Desktop Firefox'], headless: true },
+    //},
     // WebKit deshabilitado (opcional)
     // {
     //   name: 'webkit',

@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Mis Turnos</h1>
+        <h1 className="text-2xl font-bold">Turnos</h1>
         <Link href="/dashboard/reservar">
           <Button>Reservar nuevo turno</Button>
         </Link>

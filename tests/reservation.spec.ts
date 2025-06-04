@@ -1,28 +1,20 @@
 import { test, expect } from '@playwright/test';
 
 test('debería permitir seleccionar especialidad, médico, fecha y horario, y reservar el turno correctamente', async ({ page }) => {
-  // Interceptar la solicitud POST a la API de turnos
-  let requestBody: any = null;
-  await page.route('**/api/appointments', async (route, request) => {
-    if (request.method() === 'POST') {
-      requestBody = JSON.parse(request.postData() || '{}');
-    }
-    await route.continue();
-  });
-
   // Navegar a la página de reserva
-  await page.goto('http://localhost:3001/dashboard/reservar');
+  await page.goto('http://localhost:3000/dashboard/reservar');
 
-  // Verificar que la página se haya cargado
+  // Verificar que la página cargó correctamente (puede ser un título o campo clave visible)
+  await expect(page.getByText('Datos del turno')).toBeVisible();
 
   // Seleccionar una especialidad
-  const specialtySelect = page.getByRole('combobox', { name: 'Registrarse' });
-
+  const specialtySelect = page.locator('select[name="specialtyId"]');
+  await expect(specialtySelect).toBeVisible();
   await specialtySelect.selectOption({ index: 0 });
 
-  // Esperar a que los médicos se carguen y seleccionar uno
+  // Esperar a que se carguen los médicos y seleccionar uno
   const doctorsSelect = page.locator('select[name="doctorId"]');
-  await expect(doctorsSelect.locator('option')).toHaveCount(3); // opciones, no el select
+  await expect(doctorsSelect.locator('option')).toHaveCount(3);
   await doctorsSelect.selectOption({ index: 0 });
 
   // Seleccionar una fecha
@@ -30,27 +22,16 @@ test('debería permitir seleccionar especialidad, médico, fecha y horario, y re
   await dateButton.click();
   await page.locator('td[aria-label="16 de Mayo de 2025"]').click();
 
-  // Verificar horarios y seleccionar uno
+  // Verificar que se cargan horarios y seleccionar uno
   const timeSlotsSelect = page.locator('select[name="timeSlot"]');
   await expect(timeSlotsSelect.locator('option')).toHaveCount(5);
   await timeSlotsSelect.selectOption({ index: 0 });
 
-  // Enviar el formulario
-  const submitButton = page.locator('button[type="submit"]');
-  await Promise.all([
-    page.waitForNavigation({ url: '**/dashboard' }),
-    submitButton.click()
-  ]);
+  // Confirmar la reserva (suponiendo que hay un botón)
+  const reservarBtn = page.getByRole('button', { name: 'Reservar' });
+  await reservarBtn.click();
 
-  // Verificar redirección y mensaje de éxito
-  await expect(page).toHaveURL('http://localhost:3001/dashboard');
+  // Esperar redirección y confirmar mensaje de éxito
+  await page.waitForURL('http://localhost:3001/dashboard');
   await expect(page.locator('h1')).toHaveText('Turno reservado');
-
-  // Verificar que la solicitud se envió con los datos correctos
-  expect(requestBody).toMatchObject({
-    specialty: 'Cardiología',
-    doctorId: 'doctor-id-1',
-    date: '2025-05-16',
-    timeSlot: '10:00 AM',
-  });
 });

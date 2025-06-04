@@ -17,7 +17,6 @@ test('debería mostrar el dashboard correctamente para usuarios autenticados', a
 
 // Test para verificar que si no está autenticado, el usuario sea redirigido a login
 test('debería redirigir a login si el usuario no está autenticado', async ({ page }) => {
-  // Navegar al dashboard sin autenticación
   await page.goto('http://localhost:3000/dashboard');
 
   // Verificar que la página redirige a login
